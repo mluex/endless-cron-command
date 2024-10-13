@@ -1,6 +1,6 @@
 <?php
 
-namespace Mluex\EndlessCronCommand\Command\EndlessCronCommand;
+namespace Mluex\EndlessCronCommand\Command;
 
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
