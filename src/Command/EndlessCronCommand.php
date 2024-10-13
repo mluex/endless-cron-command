@@ -21,7 +21,7 @@ class EndlessCronCommand extends EndlessCommand
     private ?int $lockTtl = null;
 
     public function __construct(
-        private LockFactory $lockFactory,
+        private readonly LockFactory $lockFactory,
         string $name = null
     ) {
         parent::__construct($name);
