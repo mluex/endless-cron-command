@@ -1,0 +1,30 @@
+{
+    "name": "mluex/endless-cron-command",
+    "description": "Extension of wrep/daemonizable-command to easily run endless Symfony commands as cronjobs.",
+    "type": "library",
+    "license": "MIT",
+    "homepage": "https://github.com/mluex/endless-cron-command",
+    "keywords": ["daemon", "background process", "long running process", "symfony", "cron"],
+    "authors": [
+        {
+            "name" : "Marius Luexmann",
+            "email" : "m.luexmann@gmail.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/mluex/endless-cron-command/issues"
+    },
+    "require": {
+        "symfony/lock": "^6.0 || ^7.0",
+        "wrep/daemonizable-command": "^4.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.0 || ^9.0"
+    },
+    "autoload": {
+        "psr-4": { "Mluex\\EndlessCronCommand\\": "src/" }
+    },
+    "autoload-dev": {
+        "psr-4": { "Tests\\Mluex\\EndlessCronCommand\\": "tests/" }
+    }
+}

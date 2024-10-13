@@ -1,0 +1,17 @@
+language: php
+
+cache:
+  directories:
+    - $HOME/.composer/cache/files
+
+php:
+  - 8.0
+  - 8.1
+  - 8.2
+  - 8.3
+
+before_script:
+    - COMPOSER_ROOT_VERSION=dev-master composer --prefer-dist install
+
+script:
+  - vendor/bin/phpunit -v
