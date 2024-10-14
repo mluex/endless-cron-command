@@ -4,12 +4,16 @@ namespace Mluex\EndlessCronCommand\Command;
 
 use InvalidArgumentException;
 use Mluex\EndlessCronCommand\Exception\ShutdownLockedEndlessCommandException;
+use Mluex\EndlessCronCommand\Exception\UnsupportedLockStoreException;
+use ReflectionObject;
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
+use Throwable;
 use Wrep\Daemonizable\Command\EndlessCommand;
 
 class EndlessCronCommand extends EndlessCommand
@@ -49,6 +53,33 @@ class EndlessCronCommand extends EndlessCommand
             'TTL (sec) of the lock.',
             self::DEFAULT_LOCK_TTL
         );
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function run(InputInterface $input, OutputInterface $output): int
+    {
+        $this->checkLockStoreCompatibility();
+
+        return parent::run($input, $output);
+    }
+
+    /**
+     * @throws UnsupportedLockStoreException
+     */
+    private function checkLockStoreCompatibility(): void
+    {
+        $factoryReflection = new ReflectionObject($this->lockFactory);
+        $storeProperty = $factoryReflection->getProperty('store');
+        $store = $storeProperty->getValue($this->lockFactory);
+        if (!is_object($store)) {
+            throw new RuntimeException('Expected lock store to be an object.');
+        }
+
+        if (!method_exists($store, 'checkNotExpired')) {
+            throw new UnsupportedLockStoreException('Lock store does not support expiry.');
+        }
     }
 
     /**
