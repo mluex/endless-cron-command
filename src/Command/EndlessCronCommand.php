@@ -2,7 +2,8 @@
 
 namespace Mluex\EndlessCronCommand\Command;
 
-use RuntimeException;
+use InvalidArgumentException;
+use Mluex\EndlessCronCommand\Exception\ShutdownLockedEndlessCommandException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -58,20 +59,20 @@ class EndlessCronCommand extends EndlessCommand
         $this->startTime = time();
 
         $frequency = $input->getOption('frequency');
-        if (!is_numeric($frequency) || (int) $frequency < 1) {
-            throw new RuntimeException('Frequency must be a positive number.');
+        if (!is_numeric($frequency) || (float) $frequency < 1.0) {
+            throw new InvalidArgumentException('Frequency must be a positive number.');
         }
         $this->setTimeout((float) $frequency);
 
         $runtime = $input->getOption('runtime');
-        if (null !== $runtime && (!is_numeric($runtime) || $runtime < 1)) {
-            throw new RuntimeException('Runtime must be a positive number or empty.');
+        if (null !== $runtime && (!is_numeric($runtime) || (int) $runtime < 1)) {
+            throw new InvalidArgumentException('Runtime must be a positive number or empty.');
         }
         $this->runtime = null !== $runtime ? (int) $runtime : null;
 
         $lockTtl = $input->getOption('lock-ttl');
-        if (!is_numeric($lockTtl) || (int) $lockTtl < 1) {
-            throw new RuntimeException('Lock TTL must be a positive number.');
+        if (!is_numeric($lockTtl) || (float) $lockTtl < 1.0) {
+            throw new InvalidArgumentException('Lock TTL must be a positive number.');
         }
         $this->lockTtl = (float) $lockTtl;
 
@@ -110,10 +111,6 @@ class EndlessCronCommand extends EndlessCommand
      */
     protected function startIteration(InputInterface $input, OutputInterface $output): void
     {
-        /*
-         * It would be cleaner to catch any lock related exceptions here and shutdown the command properly by calling
-         * die() method. But unfortunately startIteration can only stop the command by throwing an exception.
-         */
         $this->acquireLock($input);
     }
 
@@ -191,7 +188,7 @@ class EndlessCronCommand extends EndlessCommand
         }
 
         if (!$this->lock->acquire()) {
-            throw new RuntimeException('Another instance is already running.');
+            throw new ShutdownLockedEndlessCommandException('Another instance is already running.');
         }
 
         $this->lock->refresh($this->lockTtl);
