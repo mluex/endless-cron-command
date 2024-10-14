@@ -20,7 +20,7 @@ EndlessCronCommands require symfony/lock to ensure that only one instance is exe
     
 ```dotenv
 ###> symfony/lock ###
-LOCK_STORE_DSN=semaphore:acme
+LOCK_STORE_DSN=mysql:host=127.0.0.1;dbname=app
 ###< symfony/lock ###
 ```
 
@@ -124,5 +124,4 @@ Every iteration will refresh the lock and push its expiry time further into the 
 
 ## TODO
 - [ ] Examples
-- [ ] Make sure lock store supports expiry
 - [ ] Unit Tests
